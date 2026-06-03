@@ -14,7 +14,7 @@ config = {
     "key_content": private_key,
 }
 
-print(f"✅ Config cargada - Region: {config['region']}, Fingerprint: {config['fingerprint']}")
+print(f"✅ Config cargada - Region: {config['region']}, Fingerprint: {config['fingerprint']}", flush=True)
 
 compute = oci.core.ComputeClient(config)
 
@@ -40,33 +40,33 @@ launch_details = oci.core.models.LaunchInstanceDetails(
     }
 )
 
-print("🚀 Iniciando intentos de creación de instancia...")
+print("🚀 Iniciando intentos de creación de instancia...", flush=True)
 
 while True:
     try:
-        print(f"⏳ Intentando crear instancia... {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"⏳ Intentando crear instancia... {time.strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
 
         result = compute.launch_instance(launch_details)
 
-        print("✅ ¡Instancia creada exitosamente!")
-        print(f"   ID: {result.data.id}")
-        print(f"   Estado: {result.data.lifecycle_state}")
+        print("✅ ¡Instancia creada exitosamente!", flush=True)
+        print(f"   ID: {result.data.id}", flush=True)
+        print(f"   Estado: {result.data.lifecycle_state}", flush=True)
         break
 
     except oci.exceptions.ServiceError as e:
-        print("STATUS:", e.status)
-        print("CODE:", e.code)
-        print("MESSAGE:", e.message)
+        print("STATUS:", e.status, flush=True)
+        print("CODE:", e.code, flush=True)
+        print("MESSAGE:", e.message, flush=True)
 
         if hasattr(e, "details"):
-            print("DETAILS:", e.details)
+            print("DETAILS:", e.details, flush=True)
 
         if (
             e.code == "InternalError"
             or "Out of host capacity" in e.message
             or e.code == "LimitExceeded"
         ):
-            print("❌ Sin capacidad disponible. Reintentando en 5 minutos...")
+            print("❌ Sin capacidad disponible. Reintentando en 5 minutos...", flush=True)
             time.sleep(300)
             continue
 
