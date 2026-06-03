@@ -45,26 +45,29 @@ print("🚀 Iniciando intentos de creación de instancia...")
 while True:
     try:
         print(f"⏳ Intentando crear instancia... {time.strftime('%Y-%m-%d %H:%M:%S')}")
+
         result = compute.launch_instance(launch_details)
-        print(f"✅ ¡Instancia creada exitosamente!")
+
+        print("✅ ¡Instancia creada exitosamente!")
         print(f"   ID: {result.data.id}")
         print(f"   Estado: {result.data.lifecycle_state}")
         break
+
     except oci.exceptions.ServiceError as e:
         print("STATUS:", e.status)
         print("CODE:", e.code)
         print("MESSAGE:", e.message)
 
-    if hasattr(e, "details"):
-        print("DETAILS:", e.details)
+        if hasattr(e, "details"):
+            print("DETAILS:", e.details)
 
-    if (
-        e.code == "InternalError"
-        or "Out of host capacity" in e.message
-        or e.code == "LimitExceeded"
-    ):
-        print("❌ Sin capacidad disponible. Reintentando en 5 minutos...")
-        time.sleep(300)
-        continue
+        if (
+            e.code == "InternalError"
+            or "Out of host capacity" in e.message
+            or e.code == "LimitExceeded"
+        ):
+            print("❌ Sin capacidad disponible. Reintentando en 5 minutos...")
+            time.sleep(300)
+            continue
 
-    raise
+        raise
