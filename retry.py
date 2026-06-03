@@ -51,9 +51,9 @@ while True:
         print(f"   Estado: {result.data.lifecycle_state}")
         break
     except oci.exceptions.ServiceError as e:
-    print("STATUS:", e.status)
-    print("CODE:", e.code)
-    print("MESSAGE:", e.message)
+        print("STATUS:", e.status)
+        print("CODE:", e.code)
+        print("MESSAGE:", e.message)
 
     if hasattr(e, "details"):
         print("DETAILS:", e.details)
