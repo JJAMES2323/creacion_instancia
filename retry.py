@@ -51,10 +51,11 @@ while True:
         print(f"   Estado: {result.data.lifecycle_state}")
         break
     except oci.exceptions.ServiceError as e:
-        if "Out of host capacity" in str(e) or "InternalError" in str(e) or "LimitExceeded" in str(e):
-            print(f"❌ Sin capacidad disponible. Reintentando en 5 minutos...")
-            time.sleep(300)
-        else:
-            print(f"💥 Error inesperado código {e.status}: {e.code}")
-            print(f"   Mensaje: {e.message}")
-            raise
+        print("STATUS:", e.status)
+        print("CODE:", e.code)
+        print("MESSAGE:", e.message)
+
+    if hasattr(e, "details"):
+        print("DETAILS:", e.details)
+
+    raise
