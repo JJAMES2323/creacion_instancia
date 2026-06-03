@@ -2,20 +2,25 @@ import oci
 import time
 import os
 
+# La llave privada puede tener problemas de saltos de línea en GitHub Secrets
+private_key = os.environ["OCI_PRIVATE_KEY"].replace("\\n", "\n")
+
 # Configuración desde variables de entorno (GitHub Secrets)
 config = {
     "user": os.environ["OCI_USER"],
     "fingerprint": os.environ["OCI_FINGERPRINT"],
     "tenancy": os.environ["OCI_TENANCY"],
     "region": os.environ["OCI_REGION"],
-    "key_content": os.environ["OCI_PRIVATE_KEY"],
+    "key_content": private_key,
 }
+
+print(f"✅ Config cargada - Region: {config['region']}, Fingerprint: {config['fingerprint']}")
 
 compute = oci.core.ComputeClient(config)
 
 launch_details = oci.core.models.LaunchInstanceDetails(
     compartment_id=os.environ["OCI_TENANCY"],
-    availability_domain="qbGX:SA-BOGOTA-1-AD-1",
+    availability_domain="bvte:SA-BOGOTA-1-AD-1",
     shape="VM.Standard.A1.Flex",
     shape_config=oci.core.models.LaunchInstanceShapeConfigDetails(
         ocpus=4,
@@ -50,5 +55,6 @@ while True:
             print(f"❌ Sin capacidad disponible. Reintentando en 5 minutos...")
             time.sleep(300)
         else:
-            print(f"💥 Error inesperado: {e}")
+            print(f"💥 Error inesperado código {e.status}: {e.code}")
+            print(f"   Mensaje: {e.message}")
             raise
