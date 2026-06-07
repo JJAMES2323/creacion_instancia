@@ -17,9 +17,27 @@ config = {
 print(f"✅ Config cargada - Region: {config['region']}, Fingerprint: {config['fingerprint']}", flush=True)
 
 compute = oci.core.ComputeClient(config)
+compartment_id = os.environ["OCI_TENANCY"]
+
+# Verificar si ya existe una instancia creada
+def instancia_ya_existe():
+    try:
+        instancias = compute.list_instances(compartment_id=compartment_id)
+        activas = [i for i in instancias.data if i.lifecycle_state not in ["TERMINATED", "TERMINATING"]]
+        if activas:
+            print(f"⚠️ Ya existe una instancia activa: {activas[0].display_name} ({activas[0].lifecycle_state})", flush=True)
+            return True
+        return False
+    except Exception as e:
+        print(f"⚠️ No se pudo verificar instancias existentes: {e}", flush=True)
+        return False
+
+if instancia_ya_existe():
+    print("🛑 Ya hay una instancia activa. Saliendo para evitar cobros.", flush=True)
+    exit(0)
 
 launch_details = oci.core.models.LaunchInstanceDetails(
-    compartment_id=os.environ["OCI_TENANCY"],
+    compartment_id=compartment_id,
     availability_domain="bvte:SA-BOGOTA-1-AD-1",
     shape="VM.Standard.A1.Flex",
     shape_config=oci.core.models.LaunchInstanceShapeConfigDetails(
@@ -40,7 +58,7 @@ launch_details = oci.core.models.LaunchInstanceDetails(
     }
 )
 
-print("🚀 Iniciando intentos de creación de instancia...", flush=True)
+print("🚀 Iniciando intentos de creación de instancia en Bogotá...", flush=True)
 
 while True:
     try:
@@ -49,7 +67,7 @@ while True:
         print("✅ ¡Instancia creada exitosamente!", flush=True)
         print(f"   ID: {result.data.id}", flush=True)
         print(f"   Estado: {result.data.lifecycle_state}", flush=True)
-        break
+        exit(0)
     except oci.exceptions.ServiceError as e:
         print("STATUS:", e.status, flush=True)
         print("CODE:", e.code, flush=True)
